@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PassGuard - Kiểm tra & Két sắt lưu trữ mật khẩu</title>
+
+<style>
+:root {
+    --blue: #1767e8;
+    --navy: #102b57;
+    --muted: #617493;
+    --line: #e2eaf8;
+    --bg: #f4f8ff;
+    --green: #16a36a;
+    --yellow: #e4a11b;
+    --red: #e34b55;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Inter, Segoe UI, Arial, sans-serif;
+    color: var(--navy);
+    background: var(--bg);
+}
+
+/* THANH ĐIỀU HƯỚNG */
+header {
+    height: 78px;
+    background: white;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    gap: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 800;
+    font-size: 23px;
+}
+
+.logo {
+    width: 43px;
+    height: 43px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #4ca2ff, #1459d7);
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 23px;
+    box-shadow: 0 6px 15px #1767e844;
+}
+
+nav {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+}
+
+nav a {
+    color: #28436d;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+nav a:hover { color: var(--blue); }
+
+/* MAIN & HERO */
+main {
+    max-width: 1180px;
+    margin: auto;
+    padding: 38px 24px 60px;
+}
+
+.hero {
+    background: linear-gradient(115deg, #eaf3ff, #cfe2ff 60%, #a9ceff);
+    border-radius: 26px;
+    padding: 38px 44px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: center;
+    overflow: hidden;
+    min-height: 240px;
+}
+
+.eyebrow {
+    color: #1767e8;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+}
+
+.hero h1 {
+    font-size: clamp(30px, 4.5vw, 48px);
+    line-height: 1.1;
+    margin: 13px 0;
+    color: #102b57;
+}
+
+.hero p {
+    font-size: 16px;
+    line-height: 1.65;
+    color: #365477;
+    max-width: 600px;
+    margin: 0;
+}
+
+.hero-art {
+    font-size: 120px;
+    text-align: center;
+}
+
+/* LAYOUT & PANELS */
+.section-title {
+    margin: 34px 0 16px;
+    font-size: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: 1.35fr 0.85fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.panel {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 26px #173c7410;
+}
+
+.panel h2 { font-size: 19px; margin: 0 0 7px; }
+.sub { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
+
+label { font-weight: 700; font-size: 13px; display: block; margin-bottom: 8px; }
+
+.input-wrap { display: flex; gap: 9px; }
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    border: 1px solid #d6e2f5;
+    border-radius: 12px;
+    padding: 13px 15px;
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+}
+
+input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px #1767e81c;
+}
+
+/* BUTTONS */
+button {
+    border: 0;
+    border-radius: 11px;
+    padding: 12px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--blue);
+    color: white;
+    font-size: 13.5px;
+    transition: 0.15s;
+}
+
+button:hover { filter: brightness(0.95); }
+button.secondary { background: #edf4ff; color: #1757b8; }
+button.danger { background: #ffeef0; color: var(--red); }
+button.success { background: #e6f8f0; color: var(--green); }
+
+/* KẾT QUẢ KIỂM TRA */
+.result {
+    margin-top: 22px;
+    padding: 17px;
+    background: #f7faff;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+}
+
+.result-head { display: flex; justify-content: space-between; align-items: center; }
+.status { font-size: 17px; font-weight: 800; }
+.score { font-size: 13px; color: var(--muted); font-weight: 700; }
+
+.bar {
+    height: 10px;
+    border-radius: 20px;
+    background: #e7edf7;
+    margin: 13px 0 15px;
+    overflow: hidden;
+}
+
+.bar span {
+    height: 100%;
+    display: block;
+    width: 0;
+    background: var(--red);
+    border-radius: 20px;
+    transition: 0.25s;
+}
+
+.time { font-size: 14px; color: #385578; }
+.criteria { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.criterion { font-size: 13px; color: #667a98; display: flex; gap: 8px; align-items: center; }
+.criterion b { color: var(--green); font-size: 15px; }
+.criterion.no b { color: #bdc8d8; }
+
+.warning {
+    margin-top: 16px;
+    color: #b7353e;
+    background: #fff0f0;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: none;
+}
+
+.tips { margin-top: 15px; font-size: 13px; color: #526987; line-height: 1.6; }
+
+/* TẠO MẬT KHẨU */
+.range-row { display: flex; justify-content: space-between; margin: 18px 0 8px; font-size: 13px; font-weight: 700; }
+.range-row output { color: var(--blue); font-size: 16px; }
+input[type=range] { width: 100%; accent-color: var(--blue); }
+.checks { display: flex; flex-wrap: wrap; gap: 16px; margin: 15px 0; }
+.checks label { font-weight: 600; display: flex; align-items: center; gap: 7px; margin: 0; }
+.generated { display: flex; gap: 8px; margin-top: 15px; }
+.generated input { background: #f8fbff; font-family: monospace; }
+
+/* KHU VỰC KÉT SẮT MẬT KHẨU (PASSWORD VAULT) */
+.vault-section { margin-top: 34px; }
+
+.vault-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr auto;
+    gap: 12px;
+    align-items: end;
+    background: #f7faff;
+    padding: 18px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    margin-bottom: 20px;
+}
+
+.vault-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.vault-table th {
+    text-align: left;
+    padding: 12px;
+    color: var(--muted);
+    border-bottom: 2px solid var(--line);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.vault-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+.pwd-mask {
+    font-family: monospace;
+    background: #f0f5ff;
+    padding: 5px 10px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+}
+
+.badge-e2e {
+    background: #e6f8f0;
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* MODAL ĐĂNG NHẬP / ĐĂNG KÝ */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 43, 87, 0.55);
+    backdrop-filter: blur(3px);
+    display: none;
+    place-items: center;
+    z-index: 50;
+    padding: 20px;
+}
+
+.modal-backdrop.open { display: grid; }
+
+.modal {
+    background: white;
+    width: 100%;
+    max-width: 430px;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.modal-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #f0f5ff;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.modal-tabs button {
+    background: transparent;
+    color: var(--muted);
+    padding: 9px;
+}
+
+.modal-tabs button.active {
+    background: white;
+    color: var(--blue);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.form-group { margin-bottom: 15px; }
+
+/* FOOTER & FEATURES */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 28px;
+}
+
+.feature {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.feature .ico { font-size: 25px; }
+.feature h3 { font-size: 15px; margin: 10px 0 6px; }
+.feature p { font-size: 12px; color: var(--muted); line-height: 1.55; margin: 0; }
+
+.author-footer {
+    margin-top: 34px;
+    background: linear-gradient(125deg, #102b57, #174b91);
+    color: #eaf2ff;
+    padding: 30px 24px 18px;
+}
+
+.author-inner {
+    max-width: 1132px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1fr;
+    gap: 28px;
+}
+
+.author-brand { display: flex; gap: 12px; }
+.author-footer h3 { font-size: 15px; margin: 2px 0 12px; color: white; }
+.author-footer p { font-size: 13px; line-height: 1.7; margin: 4px 0; color: #c9d9f2; }
+.author-footer .muted { color: #a9c0e2; font-size: 12px; }
+.author-bottom {
+    max-width: 1132px;
+    margin: 22px auto 0;
+    padding-top: 14px;
+    border-top: 1px solid #ffffff2b;
+    text-align: center;
+    color: #b2c7e7;
+    font-size: 11px;
+}
+
+@media(max-width: 850px) {
+    .layout, .hero, .feature-grid, .author-inner, .vault-form {
+        grid-template-columns: 1fr;
+    }
+    .hero-art { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- THANH CÔNG CỤ -->
+<header>
+    <div class="brand">
+        <div class="logo">🔐</div>
+        <div>
+            PassGuard
+            <div style="font-size:10px;color:#7890b3;font-weight:600;margin-top:2px">
+                Kiểm tra & Két sắt mật khẩu Zero-Knowledge
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <a href="#kiemtra">Kiểm tra</a>
+        <a href="#taomatkhau">Tạo mật khẩu</a>
+        <a href="#ketsat">Két sắt (Vault)</a>
+        <span id="userArea">
+            <button id="openAuthBtn" type="button">Đăng nhập Két sắt</button>
+        </span>
+    </nav>
+</header>
+
+<main>
+
+<!-- GIỚI THIỆU -->
+<section class="hero">
+    <div>
+        <div class="eyebrow">Kiến trúc mã hóa Zero-Knowledge</div>
+        <h1>
+            Mật khẩu mạnh,<br>
+            <span style="color:#1767e8">lưu trữ an toàn tuyệt đối.</span>
+        </h1>
+        <p>
+            Kiểm tra độ mạnh, tạo mật khẩu ngẫu nhiên và lưu trữ vào máy chủ
+            với công nghệ mã hóa đầu cuối <strong>AES-256-GCM</strong> ngay trên trình duyệt.
+        </p>
+    </div>
+    <div class="hero-art" aria-hidden="true">🛡️</div>
+</section>
+
+<!-- KHU VỰC KÉT SẮT MẬT KHẨU (PASSWORD VAULT) -->
+<section class="vault-section" id="ketsat">
+    <div class="section-title">
+        <span>🗄️ Két sắt mật khẩu của bạn</span>
+        <span class="badge-e2e">🔒 Mã hóa AES-256 trên trình duyệt</span>
+    </div>
+
+    <!-- Trạng thái chưa đăng nhập -->
+    <div class="panel" id="vaultLockedView" style="text-align:center; padding: 40px 20px;">
+        <div style="font-size: 46px; margin-bottom: 10px;">🔒</div>
+        <h2>Két sắt đang khóa</h2>
+        <p class="sub" style="max-width: 480px; margin: 8px auto 20px;">
+            Đăng nhập bằng <strong>Master Password (Mật khẩu chính)</strong> để giải mã và đồng bộ danh sách mật khẩu từ máy chủ. Máy chủ không bao giờ biết mật khẩu gốc của bạn.
+        </p>
+        <button type="button" onclick="openAuthModal('login')">Mở khóa Két sắt ngay</button>
+    </div>
+
+    <!-- Trạng thái đã đăng nhập -->
+    <div class="panel" id="vaultUnlockedView" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div>
+                <h2 style="margin:0;">Danh sách tài khoản đã lưu</h2>
+                <p class="sub" style="margin:4px 0 0;">Dữ liệu được giải mã cục bộ bằng khóa từ Master Password của bạn.</p>
+            </div>
+            <button class="secondary" type="button" onclick="logoutVault()">🔒 Khóa két sắt</button>
+        </div>
+
+        <!-- Form thêm mật khẩu mới -->
+        <form class="vault-form" id="addVaultForm">
+            <div>
+                <label for="vSite">Trang web / Ứng dụng</label>
+                <input id="vSite" type="text" placeholder="VD: Facebook, Gmail, VKU..." required>
+            </div>
+            <div>
+                <label for="vUser">Tên đăng nhập / Email</label>
+                <input id="vUser" type="text" placeholder="VD: tamnc.26ns@vku.udn.vn" required>
+            </div>
+            <div>
+                <label for="vPass">Mật khẩu cần lưu</label>
+                <input id="vPass" type="password" placeholder="Nhập hoặc dán mật khẩu..." required>
+            </div>
+            <button type="submit">+ Mã hóa & Lưu</button>
+        </form>
+
+        <div style="overflow-x:auto;">
+            <table class="vault-table">
+                <thead>
+                    <tr>
+                        <th>Dịch vụ / Website</th>
+                        <th>Tài khoản</th>
+                        <th>Mật khẩu (Đã giải mã)</th>
+                        <th style="text-align:right;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="vaultList">
+                    <tr><td colspan="4" style="text-align:center; color:var(--muted);">Chưa có mật khẩu nào được lưu.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<h2 class="section-title" id="kiemtra">
+    Kiểm tra độ mạnh mật khẩu
+</h2>
+
+<div class="layout">
+<!-- KHUNG KIỂM TRA -->
+<section class="panel">
+    <h2>🔎 Phân tích mật khẩu</h2>
+    <p class="sub">
+        Nhập mật khẩu để xem điểm số, tiêu chí đạt được và thời gian bẻ khóa ước tính.
+    </p>
+
+    <label for="password">Mật khẩu của bạn</label>
+    <div class="input-wrap">
+        <input id="password" type="password" placeholder="Nhập mật khẩu cần kiểm tra..." autocomplete="off">
+        <button class="secondary" id="toggle" type="button">Hiện</button>
+    </div>
+
+    <div class="result" aria-live="polite">
+        <div class="result-head">
+            <div class="status" id="status">Chưa có dữ liệu</div>
+            <div class="score" id="score">0/5 tiêu chí</div>
+        </div>
+        <div class="bar"><span id="bar"></span></div>
+        <div class="time">Thời gian bẻ khóa ước tính: <strong id="cracktime">—</strong></div>
+
+        <div class="criteria" id="criteria">
+            <div class="criterion no"><b>○</b> Dài từ 8 ký tự</div>
+            <div class="criterion no"><b>○</b> Có chữ in hoa</div>
+            <div class="criterion no"><b>○</b> Có chữ thường</div>
+            <div class="criterion no"><b>○</b> Có chữ số</div>
+            <div class="criterion no"><b>○</b> Có ký tự đặc biệt</div>
+        </div>
+
+        <div class="warning" id="warning"></div>
+        <div class="tips" id="tips">Mẹo: Ưu tiên mật khẩu dài, khó đoán và không dùng lại cho nhiều tài khoản.</div>
+    </div>
+</section>
+
+<!-- KHUNG TẠO MẬT KHẨU -->
+<aside class="panel" id="taomatkhau">
+    <h2>✨ Tạo mật khẩu mạnh</h2>
+    <p class="sub">Tạo một mật khẩu ngẫu nhiên và lưu thẳng vào Két sắt.</p>
+
+    <div class="range-row">
+        <label for="length" style="margin:0">Độ dài mật khẩu</label>
+        <output id="lengthOut">16 ký tự</output>
+    </div>
+    <input id="length" type="range" min="8" max="32" value="16">
+
+    <div class="checks">
+        <label><input type="checkbox" id="digits" checked> Chữ số</label>
+        <label><input type="checkbox" id="symbols" checked> Ký tự đặc biệt</label>
+    </div>
+
+    <button id="generate" type="button" style="width:100%">Tạo mật khẩu</button>
+
+    <div class="generated">
+        <input id="generated" readonly placeholder="Mật khẩu được tạo sẽ hiển thị ở đây">
+        <button class="secondary" id="copy" type="button">Sao chép</button>
+    </div>
+
+    <button class="success" id="sendToVaultBtn" type="button" style="width:100%; margin-top:10px;">
+        📥 Đưa mật khẩu này vào Két sắt
+    </button>
+
+    <p class="sub" id="copyMsg" style="margin:10px 0 0"></p>
+</aside>
+</div>
+
+<!-- CÁC TÍNH NĂNG -->
+<section class="feature-grid">
+    <div class="feature">
+        <div class="ico">🔐</div>
+        <h3>Zero-Knowledge Vault</h3>
+        <p>Mật khẩu được mã hóa bằng AES-GCM 256-bit trước khi rời khỏi trình duyệt. Máy chủ chỉ lưu chuỗi mã hóa mù.</p>
+    </div>
+    <div class="feature">
+        <div class="ico">🔑</div>
+        <h3>Dẫn xuất khóa PBKDF2</h3>
+        <p>Sử dụng 100.000 vòng lặp SHA-256 để tách biệt khóa xác thực đăng nhập và khóa giải mã dữ liệu.</p>
+    </div>
+    <div class="feature">
+        <div class="ico">⚠️</div>
+        <h3>Phân tích rủi ro tức thì</h3>
+        <p>Nhận diện mật khẩu phổ biến, chuỗi số, ngày sinh và tính toán thời gian chống tấn công Brute-force.</p>
+    </div>
+</section>
+
+</main>
+
+<!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+<div class="modal-backdrop" id="authModal">
+    <div class="modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h2 style="margin:0; font-size:20px;">🔐 Két sắt PassGuard</h2>
+            <button class="secondary" type="button" onclick="closeAuthModal()" style="padding:6px 11px;">✕</button>
+        </div>
+
+        <div class="modal-tabs">
+            <button type="button" id="tabLogin" class="active" onclick="switchAuthTab('login')">Đăng nhập</button>
+            <button type="button" id="tabRegister" onclick="switchAuthTab('register')">Tạo tài khoản</button>
+        </div>
+
+        <form id="authForm">
+            <div class="form-group">
+                <label for="authEmail">Email tài khoản</label>
+                <input id="authEmail" type="email" placeholder="nhapemail@vku.udn.vn" required>
+            </div>
+            <div class="form-group">
+                <label for="masterPassword">Master Password (Mật khẩu chính)</label>
+                <input id="masterPassword" type="password" placeholder="Tối thiểu 8 ký tự mạnh..." required minlength="8">
+            </div>
+            <p class="sub" id="authHint" style="font-size:12px; color:#b7353e;">
+                Lưu ý: Master Password dùng để mã hóa toàn bộ két sắt. Nếu quên, máy chủ cũng không thể khôi phục giúp bạn!
+            </p>
+            <div id="authMsg" style="font-size:13px; margin-bottom:12px; font-weight:600;"></div>
+            <button type="submit" id="authSubmitBtn" style="width:100%;">Mở khóa Két sắt</button>
+        </form>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="author-footer">
+    <div class="author-inner">
+        <div>
+            <div class="author-brand">
+                <div class="logo">🔐</div>
+                <div>
+                    <h3>PassGuard</h3>
+                    <p class="muted">Hệ thống Kiểm tra & Lưu trữ mật khẩu an toàn</p>
+                    <p>Bảo vệ danh tính số với chuẩn mã hóa đầu cuối trên trình duyệt.</p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <h3>Thông tin tác giả</h3>
+            <p><strong>Nguyễn Công Tâm</strong> · tamnc.26ns@vku.udn.vn</p>
+            <p><strong>Nguyễn Nhật Tân</strong> · tannn.26ns@vku.udn.vn</p>
+            <p class="muted">Nhóm thực hiện dự án PassGuard</p>
+        </div>
+        <div>
+            <h3>Giảng viên hướng dẫn</h3>
+            <p><strong>Hoàng Hữu Đức</strong></p>
+            <p class="muted">Dự án nâng cao nhận thức và giải pháp an toàn mật khẩu</p>
+        </div>
+    </div>
+    <div class="author-bottom">
+        © 2026 PassGuard · Zero-Knowledge Password Vault Architecture
+    </div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+/* =========================================================================
+   PHẦN 1: MODULE MÃ HÓA ZERO-KNOWLEDGE (WEB CRYPTO API - AES-GCM + PBKDF2)
+   ========================================================================= */
+let sessionToken = null;
+let sessionEmail = null;
+let vaultCryptoKey = null;
+
+const bufToBase64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const base64ToBuf = b64 => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+
+function generateSalt() {
+    return bufToBase64(crypto.getRandomValues(new Uint8Array(16)));
+}
+
+async function deriveKeys(masterPassword, saltBase64) {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(masterPassword),
+        'PBKDF2',
+        false,
+        ['deriveBits', 'deriveKey']
+    );
+
+    const salt = base64ToBuf(saltBase64);
+
+    const encryptionKey = await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+    );
+
+    const authBits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: salt.slice().reverse(), iterations: 100000, hash: 'SHA-256' },
+        keyMaterial,
+        256
+    );
+
+    return {
+        encryptionKey,
+        authPassword: bufToBase64(authBits)
+    };
+}
+
+async function encryptSecret(plainText) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(plainText);
+    const cipherBuf = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        vaultCryptoKey,
+        encoded
+    );
+    return {
+        ciphertext: bufToBase64(cipherBuf),
+        iv: bufToBase64(iv)
+    };
+}
+
+async function decryptSecret(ciphertextB64, ivB64) {
+    try {
+        const decryptedBuf = await crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: base64ToBuf(ivB64) },
+            vaultCryptoKey,
+            base64ToBuf(ciphertextB64)
+        );
+        return new TextDecoder().decode(decryptedBuf);
+    } catch (e) {
+        return '⚠️ Lỗi giải mã (Sai khóa)';
+    }
+}
+
+/* =========================================================================
+   PHẦN 2: QUẢN LÝ ĐĂNG NHẬP, ĐĂNG KÝ & GIAO TIẾP API MÁY CHỦ
+   ========================================================================= */
+let authMode = 'login';
+
+function openAuthModal(mode = 'login') {
+    switchAuthTab(mode);
+    $('authModal').classList.add('open');
+}
+
+function closeAuthModal() {
+    $('authModal').classList.remove('open');
+    $('authMsg').textContent = '';
+}
+
+function switchAuthTab(mode) {
+    authMode = mode;
+    $('tabLogin').classList.toggle('active', mode === 'login');
+    $('tabRegister').classList.toggle('active', mode === 'register');
+    $('authSubmitBtn').textContent = mode === 'login' ? 'Mở khóa Két sắt' : 'Đăng ký & Tạo Két sắt';
+    $('authMsg').textContent = '';
+}
+
+$('openAuthBtn').addEventListener('click', () => openAuthModal('login'));
+
+$('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = $('authEmail').value.trim().toLowerCase();
+    const masterPwd = $('masterPassword').value;
+    const msgEl = $('authMsg');
+
+    msgEl.style.color = 'var(--blue)';
+    msgEl.textContent = 'Đang dẫn xuất khóa bảo mật (100,000 vòng PBKDF2)...';
+
+    const authSalt = bufToBase64(new TextEncoder().encode(email.padEnd(16, '#')));
+    const { authPassword } = await deriveKeys(masterPwd, authSalt);
+
+    try {
+        if (authMode === 'register') {
+            const cryptoSalt = generateSalt();
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, authPassword, cryptoSalt })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            msgEl.style.color = 'var(--green)';
+            msgEl.textContent = 'Tạo tài khoản thành công! Đang chuyển sang đăng nhập...';
+            setTimeout(() => switchAuthTab('login'), 900);
+        } else {
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, authPassword })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            const keys = await deriveKeys(masterPwd, data.cryptoSalt);
+            vaultCryptoKey = keys.encryptionKey;
+            sessionToken = data.token;
+            sessionEmail = data.email;
+
+            $('masterPassword').value = '';
+            closeAuthModal();
+            updateVaultUI();
+            loadVaultItems();
+        }
+    } catch (err) {
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = err.message || 'Không thể kết nối tới máy chủ.';
+    }
+});
+
+function updateVaultUI() {
+    const loggedIn = Boolean(sessionToken && vaultCryptoKey);
+    $('vaultLockedView').style.display = loggedIn ? 'none' : 'block';
+    $('vaultUnlockedView').style.display = loggedIn ? 'block' : 'none';
+
+    if (loggedIn) {
+        $('userArea').innerHTML = `
+            <span style="font-size:13px; font-weight:700; color:var(--blue); margin-right:8px;">👤 ${sessionEmail}</span>
+            <button class="secondary" type="button" onclick="logoutVault()">Đăng xuất</button>
+        `;
+    } else {
+        $('userArea').innerHTML = `<button id="openAuthBtn" type="button" onclick="openAuthModal('login')">Đăng nhập Két sắt</button>`;
+    }
+}
+
+function logoutVault() {
+    sessionToken = null;
+    sessionEmail = null;
+    vaultCryptoKey = null;
+    $('vaultList').innerHTML = '';
+    updateVaultUI();
+}
+
+async function loadVaultItems() {
+    const res = await fetch('/api/vault', {
+        headers: { 'Authorization': 'Bearer ' + sessionToken }
+    });
+    const items = await res.json();
+    const tbody = $('vaultList');
+
+    if (!items.length) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:24px;">Két sắt trống. Hãy thêm mật khẩu đầu tiên ở trên!</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = '';
+    for (const item of items) {
+        const plainPassword = await decryptSecret(item.ciphertext, item.iv);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${escapeHtml(item.site_name)}</strong></td>
+            <td>${escapeHtml(item.username)}</td>
+            <td>
+                <span class="pwd-mask" data-pwd="${escapeHtml(plainPassword)}" data-shown="false">••••••••••••</span>
+            </td>
+            <td style="text-align:right; white-space:nowrap;">
+                <button class="secondary" type="button" onclick="toggleVaultPwd(this)" style="padding:7px 11px;">Hiện</button>
+                <button class="secondary" type="button" onclick="copyVaultPwd(this)" style="padding:7px 11px;">Chép</button>
+                <button class="danger" type="button" onclick="deleteVaultItem(${item.id})" style="padding:7px 11px;">Xóa</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    }
+}
+
+$('addVaultForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const site_name = $('vSite').value.trim();
+    const username = $('vUser').value.trim();
+    const rawPwd = $('vPass').value;
+
+    const { ciphertext, iv } = await encryptSecret(rawPwd);
+
+    const res = await fetch('/api/vault', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionToken
+        },
+        body: JSON.stringify({ site_name, username, ciphertext, iv })
+    });
+
+    if (res.ok) {
+        $('vSite').value = '';
+        $('vUser').value = '';
+        $('vPass').value = '';
+        loadVaultItems();
+    } else {
+        alert('Lỗi khi lưu mật khẩu lên máy chủ.');
+    }
+});
+
+async function deleteVaultItem(id) {
+    if (!confirm('Bạn chắc chắn muốn xóa mục này khỏi két sắt?')) return;
+    await fetch('/api/vault/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + sessionToken }
+    });
+    loadVaultItems();
+}
+
+function toggleVaultPwd(btn) {
+    const span = btn.closest('tr').querySelector('.pwd-mask');
+    const isShown = span.dataset.shown === 'true';
+    span.textContent = isShown ? '••••••••••••' : span.dataset.pwd;
+    span.dataset.shown = !isShown;
+    btn.textContent = isShown ? 'Hiện' : 'Ẩn';
+}
+
+async function copyVaultPwd(btn) {
+    const pwd = btn.closest('tr').querySelector('.pwd-mask').dataset.pwd;
+    await navigator.clipboard.writeText(pwd);
+    const oldText = btn.textContent;
+    btn.textContent = 'Đã chép!';
+    setTimeout(() => btn.textContent = oldText, 1500);
+}
+
+$('sendToVaultBtn').addEventListener('click', () => {
+    const genPwd = $('generated').value;
+    if (!genPwd) {
+        $('copyMsg').textContent = 'Hãy bấm "Tạo mật khẩu" trước.';
+        return;
+    }
+    if (!sessionToken) {
+        openAuthModal('login');
+        return;
+    }
+    $('vPass').value = genPwd;
+    $('vSite').focus();
+    document.getElementById('ketsat').scrollIntoView({ behavior: 'smooth' });
+});
+
+function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+/* =========================================================================
+   PHẦN 3: LOGIC KIỂM TRA ĐỘ MẠNH & TẠO MẬT KHẨU GỐC CỦA PASSGUARD
+   ========================================================================= */
+const common = ['123456', 'password', 'qwerty', 'admin', 'sinhvien', 'matkhau'];
+
+function formatTime(seconds) {
+    if (!Number.isFinite(seconds) || seconds > 3.154e16) return 'hàng triệu năm hoặc lâu hơn';
+    if (seconds < 1) return 'dưới 1 giây';
+    if (seconds < 60) return Math.max(1, Math.round(seconds)) + ' giây';
+    if (seconds < 3600) return Math.round(seconds / 60) + ' phút';
+    if (seconds < 86400) return Math.round(seconds / 3600) + ' giờ';
+    if (seconds < 31536000) return Math.round(seconds / 86400) + ' ngày';
+    if (seconds < 3153600000) return Math.round(seconds / 31536000) + ' năm';
+    return Math.round(seconds / 31536000).toLocaleString('vi-VN') + ' năm';
+}
+
+function analyze(p) {
+    const checks = [
+        p.length >= 8,
+        /[A-Z]/.test(p),
+        /[a-z]/.test(p),
+        /[0-9]/.test(p),
+        /[^A-Za-z0-9\s]/.test(p)
+    ];
+    const score = checks.filter(Boolean).length;
+    const lower = p.toLowerCase();
+    const matched = common.find(w => lower.includes(w));
+    const allDigits = /^\d+$/.test(p) && p.length > 0;
+    const datePattern = /^(0[1-9]|[12]\d|3[01])[\/.-](0[1-9]|1[0-2])[\/.-]\d{4}$/.test(p);
+
+    const warnings = [];
+    if (matched) warnings.push('Có chứa chuỗi phổ biến "' + matched + '".');
+    if (allDigits) warnings.push('Mật khẩu chỉ gồm chữ số.');
+    if (datePattern) warnings.push('Mật khẩu có dạng ngày sinh (DD/MM/YYYY).');
+
+    let pool = 0;
+    if (/[a-z]/.test(p)) pool += 26;
+    if (/[A-Z]/.test(p)) pool += 26;
+    if (/[0-9]/.test(p)) pool += 10;
+    if (/[^A-Za-z0-9\s]/.test(p)) pool += 33;
+
+    let seconds = pool ? Math.pow(pool, p.length) / 1e10 / 2 : 0;
+    if (warnings.length) seconds = Math.min(seconds, 3);
+
+    let level = 'Yếu', color = 'var(--red)';
+    if (p.length < 8 || score <= 2 || seconds < 3600) {
+        level = 'Yếu'; color = 'var(--red)';
+    } else if (score === 5 || seconds > 100 * 31536000) {
+        level = 'Mạnh'; color = 'var(--green)';
+    } else {
+        level = 'Trung bình'; color = 'var(--yellow)';
+    }
+    return { checks, score, warnings, seconds, level, color };
+}
+
+function update() {
+    const p = $('password').value;
+    const labels = ['Dài từ 8 ký tự', 'Có chữ in hoa', 'Có chữ thường', 'Có chữ số', 'Có ký tự đặc biệt'];
+
+    if (!p) {
+        $('status').textContent = 'Chưa có dữ liệu';
+        $('status').style.color = 'var(--navy)';
+        $('score').textContent = '0/5 tiêu chí';
+        $('bar').style.width = '0';
+        $('cracktime').textContent = '—';
+        $('warning').style.display = 'none';
+        $('tips').textContent = 'Mẹo: Ưu tiên mật khẩu dài, khó đoán và không dùng lại cho nhiều tài khoản.';
+        $('criteria').innerHTML = labels.map(x => '<div class="criterion no"><b>○</b> ' + x + '</div>').join('');
+        return;
+    }
+
+    const r = analyze(p);
+    $('status').textContent = 'Mức độ: ' + r.level;
+    $('status').style.color = r.color;
+    $('score').textContent = r.score + '/5 tiêu chí';
+    $('bar').style.width = (r.score * 20) + '%';
+    $('bar').style.background = r.color;
+    $('cracktime').textContent = formatTime(r.seconds);
+
+    $('criteria').innerHTML = labels.map((x, i) =>
+        '<div class="criterion ' + (r.checks[i] ? '' : 'no') + '"><b>' + (r.checks[i] ? '✓' : '○') + '</b> ' + x + '</div>'
+    ).join('');
+
+    $('warning').style.display = r.warnings.length ? 'block' : 'none';
+    $('warning').textContent = r.warnings.length ? '⚠ ' + r.warnings.join(' ') : '';
+
+    const suggestions = [];
+    if (!r.checks[0]) suggestions.push('tăng độ dài lên ít nhất 8 ký tự');
+    if (!r.checks[1]) suggestions.push('thêm chữ in hoa');
+    if (!r.checks[2]) suggestions.push('thêm chữ thường');
+    if (!r.checks[3]) suggestions.push('thêm chữ số');
+    if (!r.checks[4]) suggestions.push('thêm ký tự đặc biệt');
+    if (r.warnings.length) suggestions.push('tránh từ phổ biến, ngày sinh hoặc chuỗi chỉ gồm số');
+
+    $('tips').textContent = suggestions.length
+        ? 'Gợi ý: Hãy ' + suggestions.join('; ') + '.'
+        : 'Tốt! Bạn có thể lưu mật khẩu này vào Két sắt để sử dụng an toàn.';
+}
+
+$('password').addEventListener('input', update);
+
+$('toggle').addEventListener('click', () => {
+    const p = $('password');
+    p.type = p.type === 'password' ? 'text' : 'password';
+    $('toggle').textContent = p.type === 'password' ? 'Hiện' : 'Ẩn';
+});
+
+$('length').addEventListener('input', e => {
+    $('lengthOut').textContent = e.target.value + ' ký tự';
+});
+
+function randomInt(max) {
+    const a = new Uint32Array(1);
+    crypto.getRandomValues(a);
+    return a[0] % max;
+}
+
+$('generate').addEventListener('click', () => {
+    let chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if ($('digits').checked) chars += '0123456789';
+    if ($('symbols').checked) chars += '!@#$%^&*()-_=+[]{};:,.?';
+
+    const len = +$('length').value;
+    let out = '';
+    out += 'abcdefghijklmnopqrstuvwxyz'[randomInt(26)];
+    out += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[randomInt(26)];
+    if ($('digits').checked) out += '0123456789'[randomInt(10)];
+    if ($('symbols').checked) out += '!@#$%^&*()-_=+[]{};:,.?'[randomInt(24)];
+
+    while (out.length < len) out += chars[randomInt(chars.length)];
+    out = out.split('').sort(() => randomInt(3) - 1).join('');
+
+    $('generated').value = out;
+    $('copyMsg').textContent = 'Mật khẩu đã được tạo trên thiết bị của bạn.';
+});
+
+$('copy').addEventListener('click', async () => {
+    const v = $('generated').value;
+    if (!v) { $('copyMsg').textContent = 'Hãy tạo mật khẩu trước.'; return; }
+    await navigator.clipboard.writeText(v);
+    $('copyMsg').textContent = 'Đã sao chép mật khẩu.';
+});
+</script>
+</body>
+</html>
